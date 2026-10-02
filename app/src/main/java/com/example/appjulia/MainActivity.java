@@ -1,6 +1,8 @@
 package com.example.appjulia;
 
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,7 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
-
+    String nomes[] = new String[]{"Ju", "Helo", "Jojo", "Duda", "Kiki", "Oó"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,5 +22,10 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        ListView lv = findViewById(R.id.listView);
+       ArrayAdapter<String> adaptador = new ArrayAdapter<>(getApplicationContext(),R.layout.item_lista, R.id.textView, nomes);
+
+       lv.setAdapter(adaptador);
+      lv.setOnItemClickListener((parent, view, position, id) ->{});
     }
 }
