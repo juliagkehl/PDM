@@ -2,6 +2,8 @@ package com.example.appjulia;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -11,8 +13,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
-    String nomes[] = new String[]{"Ju", "Helo", "Jojo", "Duda", "Kiki", "Oó"};
+    ArrayList<String>nomes = new ArrayList<>();
+    //String nomes[] = new String[]{"Juju", "Helo", "Jojo", "Duda", "Kiki", "Oó"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,12 +28,18 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        EditText editaNome = findViewById(R.id.editaNome);
+        Button botaoSalvar = findViewById(R.id.botaoSalvar);
         ListView lv = findViewById(R.id.listView);
-        ArrayAdapter<String> adaptador = new ArrayAdapter<>(getApplicationContext(), R.layout.item_lista, R.id.textView, nomes);
 
-        lv.setAdapter(adaptador);
+        ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, R.layout.item_lista, R.id.textView, nomes);
+
+        //ArrayAdapter<String> adaptador = new ArrayAdapter<>(getApplicationContext(), R.layout.item_lista, R.id.textView, nomes);
+
+       // lv.setAdapter(adaptador);
         lv.setOnItemClickListener((parent, view, position, id) -> {
-            Toast.makeText(getApplicationContext(), nomes[position], Toast.LENGTH_LONG).show();
+            Toast.makeText(this, nomes.get(position), Toast.LENGTH_LONG).show();
         });
     }
+
 }
