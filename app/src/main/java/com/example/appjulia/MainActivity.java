@@ -14,48 +14,69 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String>nomes = new ArrayList<>();
-    //String nomes[] = new String[]{"Juju", "Helo", "Jojo", "Duda", "Kiki", "Oó"};
+
+    private EditText editaTitulo;
+    private EditText editaTexto;
+
+    private NotaDbHelper dbHelper;
+    private final List<Nota> listaNotas = new ArrayList<>();
+    private ArrayAdapter<Nota> adaptador;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        EditText editaNome = findViewById(R.id.editaNome);
-        Button botaoSalvar = findViewById(R.id.botaoSalvar);
-        ListView lv = findViewById(R.id.listView);
 
-        ArrayAdapter<String> adaptador = new ArrayAdapter<>(this, R.layout.item_lista, R.id.textView, nomes);
+        editaTitulo = findViewById(R.id.editaTitulo);
+        editaTexto = findViewById(R.id.editaTexto);
+        Button botaoSalvar = findViewById(R.id.botaoSalvar);
+        ListView listView = findViewById(R.id.listView);
+
+        dbHelper = new NotaDbHelper(this);
+
+        adaptador = new ArrayAdapter<>(this, R.layout.item_lista, R.id.textView, listaNotas);
+        listView.setAdapter(adaptador);
+
+        carregarNotas();
 
         botaoSalvar.setOnClickListener(v -> {
-            String nome = editaNome.getText().toString().trim();
+            String titulo = editaTitulo.getText().toString().trim();
+            String texto = editaTexto.getText().toString().trim();
 
-            if (!nome.isEmpty()) {
-                nomes.add(nome);
-                adaptador.notifyDataSetChanged();
-                editaNome.setText("");
-
-                Toast.makeText(this, "Nome salvo!", Toast.LENGTH_SHORT).show();
-
+            if (!titulo.isEmpty() || !texto.isEmpty()) {
+                long id = dbHelper.inserirNota(titulo, texto);
+                if (id != -1) {
+                    Toast.makeText(this, "Nota salva com sucesso!", Toast.LENGTH_SHORT).show();
+                    editaTitulo.setText("");
+                    editaTexto.setText("");
+                    carregarNotas();
+                } else {
+                    Toast.makeText(this, "Erro ao salvar nota!", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "Digite um nome!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Preencha o título ou o texto!", Toast.LENGTH_SHORT).show();
             }
         });
 
-        //ArrayAdapter<String> adaptador = new ArrayAdapter<>(getApplicationContext(), R.layout.item_lista, R.id.textView, nomes);
-
-        lv.setAdapter(adaptador);
-        lv.setOnItemClickListener((parent, view, position, id) -> {
-            Toast.makeText(this, nomes.get(position), Toast.LENGTH_LONG).show();
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Nota nota = listaNotas.get(position);
+            Toast.makeText(this, "Nota #" + nota.getId() + ": " + nota.getTitulo(), Toast.LENGTH_SHORT).show();
         });
     }
 
+    private void carregarNotas() {
+        listaNotas.clear();
+        listaNotas.addAll(dbHelper.obterTodasNotas());
+        adaptador.notifyDataSetChanged();
+    }
 }
